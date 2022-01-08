@@ -1,0 +1,13 @@
+{
+  "endpointBase": "http://127.0.0.1:3002",
+  "engineName": "your-engine-name",
+  "hostIdentifier": "host-XXXXX",
+  "searchKey": "search-XXXXXXXXXXXXXXXXXXXXXXX",
+  "searchFields": ["title", "description"],
+  "resultFields": ["id", "title", "anotherField", "someField", "created"],
+  "querySuggestFields": ["title"],
+  "titleField": "title",
+  "urlField": "url",
+  "sortFields": ["title", "anotherField"],
+  "facets": ["anotherField", "someField"]
+}

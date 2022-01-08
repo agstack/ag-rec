@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: enterprisesearch-solo
+  labels:
+    app: enterprisesearch-solo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: enterprisesearch-solo
+  template:
+    metadata:
+      labels:
+        app: enterprisesearch-solo
+    spec:
+      containers:
+        - env:
+            - name: ENT_SEARCH_DEFAULT_PASSWORD
+              value: # Enter Password for Enterprise Search
+            - name: JAVA_OPTS
+              value: -Xms512m -Xmx512m
+            - name: allow_es_settings_modification
+              value: "true"
+            - name: elasticsearch.host
+              value: # Enter Elasticsearch's host and port
+            - name: elasticsearch.password
+              value: # Enter Elasticsearch's Password
+            - name: elasticsearch.startup_retry.interval
+              value: "15"
+            - name: elasticsearch.username
+              value: # Enter Elasticsearch's Username
+            - name: secret_management.encryption_keys
+              value: # Enter secret encryption key
+          name: enterprisesearch
+          image: docker.elastic.co/enterprise-search/enterprise-search:7.14.1
+      ports:
+        - containerPort: 3002
+          name: enterprisesearch
+          protocol: TCP
+      imagePullSecrets:
+        - name: all-icr-io

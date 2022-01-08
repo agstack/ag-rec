@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kibana-solo
+  labels:
+    app: kibana-solo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kibana-solo
+  template:
+    metadata:
+      labels:
+        app: kibana-solo
+    spec:
+      containers:
+        - env:
+            - name: ELASTICSEARCH_HOSTS
+              value: # Enter Elasticsearch's host and port
+            - name: ELASTICSEARCH_PASSWORD
+              value: # Enter Elasticsearch's Password
+            - name: ELASTICSEARCH_USERNAME
+              value: # Enter Elasticsearch's Username
+            - name: ENTERPRISESEARCH_HOST
+              value: # Enter Enterprise Search's host and port
+          name: kibana
+          image: docker.elastic.co/kibana/kibana:7.14.1
+      ports:
+        - containerPort: 5601
+          name: kibana
+          protocol: TCP
+      imagePullSecrets:
+        - name: all-icr-io

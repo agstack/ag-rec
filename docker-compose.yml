@@ -1,0 +1,65 @@
+version: "1"
+
+networks:
+  elastic:
+    driver: bridge
+
+volumes:
+  elasticsearch:
+    driver: local
+
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.14.1
+    restart: unless-stopped
+    environment:
+      - "discovery.type=single-node"
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - "xpack.security.enabled=true"
+      - "xpack.security.authc.api_key.enabled=true"
+      - #"ELASTIC_PASSWORD=Enter Password for Elasticsearch"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - elasticsearch:/usr/share/elasticsearch/data
+    ports:
+      - 127.0.0.1:9200:9200
+    networks:
+      - elastic
+
+  ent-search:
+    image: docker.elastic.co/enterprise-search/enterprise-search:7.14.1
+    restart: unless-stopped
+    depends_on:
+      - "elasticsearch"
+    environment:
+      - "JAVA_OPTS=-Xms512m -Xmx512m"
+      - #"ENT_SEARCH_DEFAULT_PASSWORD=Enter Password for Enterprise Search"
+      - #"elasticsearch.username=Enter Elasticsearch's Username"
+      - #"elasticsearch.password=Enter Elasticsearch's Password"
+      - "elasticsearch.host=http://elasticsearch:9200"
+      - "allow_es_settings_modification=true"
+      - "secret_management.encryption_keys=Enter Encryption Key"
+      - "elasticsearch.startup_retry.interval=15"
+    ports:
+      - 127.0.0.1:3002:3002
+    networks:
+      - elastic
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.14.1
+    restart: unless-stopped
+    depends_on:
+      - "elasticsearch"
+      - "ent-search"
+    ports:
+      - 127.0.0.1:5601:5601
+    environment:
+      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+      ENTERPRISESEARCH_HOST: http://ent-search:3002
+      ELASTICSEARCH_USERNAME: # Enter Elasticsearch's Username
+      ELASTICSEARCH_PASSWORD: # Enter Elasticsearch's Password
+    networks:
+      - elastic

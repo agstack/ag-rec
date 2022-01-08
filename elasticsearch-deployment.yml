@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: elasticsearch-solo
+  labels:
+    app: elasticsearch-solo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: elasticsearch-solo
+  template:
+    metadata:
+      labels:
+        app: elasticsearch-solo
+    spec:
+      containers:
+        - env:
+            - name: ELASTIC_PASSWORD
+              value: # Enter Password for Elasticsearch
+            - name: ES_JAVA_OPTS
+              value: -Xms512m -Xmx512m
+            - name: discovery.type
+              value: single-node
+            - name: xpack.security.authc.api_key.enabled
+              value: "true"
+            - name: xpack.security.enabled
+              value: "true"
+          name: elasticsearch
+          image: docker.elastic.co/elasticsearch/elasticsearch:7.14.1
+      ports:
+        - containerPort: 9200
+          name: elasticsearch
+          protocol: TCP
+      imagePullSecrets:
+        - name: # Enter image pull secret value

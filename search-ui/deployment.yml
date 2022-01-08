@@ -1,0 +1,64 @@
+# Deploy the AgRec Search UI
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: agrec-search-ui
+  labels:
+    app: agrec-search-ui
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: agrec-search-ui
+  template:
+    metadata:
+      labels:
+        app: agrec-search-ui
+    spec:
+      containers:
+        - name: agrec-search-ui
+          image: # Your image path/location here. Example "us.icr.io/agRec/searchUI:v1"
+      imagePullSecrets:
+        - name: # Your secrets here. Example all-icr-io
+
+---
+# Service for AgRec Search UI
+apiVersion: v1
+kind: Service
+metadata:
+  name: agrec-ui-svc
+  annotations:
+    service.kubernetes.io/ibm-load-balancer-cloud-provider-enable-features: "nlb"
+spec:
+  selector:
+    app: agrec-search-ui
+  ports:
+    - name: http
+      protocol: TCP
+      port: 4000
+      targetPort: 4000
+
+---
+# Ingress for AgRec Search UI
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: agrec-search-ui-ingress-resource
+  annotations:
+    kubernetes.io/ingress.class: "public-iks-k8s-nginx"
+spec:
+  tls:
+    - hosts:
+        -  # Your Ingress subdomain value here. Example: my-cluster-us-east-1-514bd37ab295f8aeaf548c9dacf89542-0000.us-east.containers.appdomain.cloud
+      secretName: # Your Ingress secret value here. Example: my-cluster-us-east-1-514bd37ab295f8aeaf548c9dacf89542-0000
+  rules:
+    - host:  # Your backend endpoint value which is a custom pre-fix value for Ingress subdomain. Example: agrec.my-cluster-us-east-1-514bd37ab295f8aeaf548c9dacf89542-0000.us-east.containers.appdomain.cloud
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: agrec-ui-svc
+                port:
+                  number: 4000
